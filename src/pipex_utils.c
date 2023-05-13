@@ -56,7 +56,22 @@ char *find_path(char *cmd, char **env)
     return (NULL);
 }
 
-void    execute(char *path, char **env)
+void    execute(char *argv, char **env)
 {
-    
+    char    **cmd;
+    char    *path;
+    int     i;
+
+    cmd = ft_split(argv, ' ');
+    path = find_path(cmd[0], env);
+    i = 0;
+    if (!path)
+    {
+        while (cmd[i])
+            free(cmd[i++]);
+        free(cmd);
+        error();
+    }
+    if (execve(path, cmd, env) == -1)
+        error();
 }
