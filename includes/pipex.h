@@ -6,7 +6,7 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 19:48:57 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/05/18 18:50:58 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/05/18 20:50:01 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 char	**ft_split(char const *s, char c);
 //_______________________________/utils/__________________________________//
 int	    ft_strncmp(const char *s1, const char *s2, size_t n);
-char	*ft_strdup(const char *s1);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
 //_______________________________/pipex_utils/____________________________//
 int     slash_check(char *cmd);
 char    *find_path(char *cmd, char **env);
