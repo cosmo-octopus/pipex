@@ -6,13 +6,13 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 20:00:13 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/05/12 18:52:18 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/05/18 18:41:58 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-void    error()
+void    error(void)
 {
     perror("Error");
     exit(EXIT_FAILURE);
@@ -28,39 +28,48 @@ void    process_new(char *argv, char **env)
     id = fork();
     if (id == 0)
     {
-                
+        close(fd[0]);
+        dup2(fd[1], 1);
+        execute(argv, env);
+    }
+    else
+    {
+        close(fd[1]);
+        dup2(fd[0], 0);
+        wait(NULL);
     }
 }
 
-// void    heredoc(char *delimiter, int argc)
-// {
-//     pid_t   id;
-//     int     fd[2];
-//     char    *line;
+void    heredoc(char *delimiter, int argc)
+{
+    pid_t   id;
+    int     fd[2];
+    char    *line;
 
-//     if (pipe(fd) == -1)
-//         error();
-//     id = fork();
-//     if (id == 0)
-//     {
-//         close(fd[0]);
-//         while (1)
-//         {
-//             line = get_next_line(0);
-//             if (!line)
-//                 return ;
-//             if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0)
-//                 exit(EXIT_SUCCESS);
-//             write(fd[1], line, ft_strlen(line));
-//         }
-//     }
-//     else
-//     {
-//         close(fd[1]);
-//         dup2(fd[0], 1);
-//         wait(NULL);
-//     }
-// }
+    argc = 1;
+    if (pipe(fd) == -1)
+        error();
+    id = fork();
+    if (id == 0)
+    {
+        close(fd[0]);
+        while (1)
+        {
+            line = get_next_line(0);
+            if (!line)
+                return ;
+            if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0)
+                exit(EXIT_SUCCESS);
+            write(fd[1], line, ft_strlen(line));
+        }
+    }
+    else
+    {
+        close(fd[1]);
+        dup2(fd[0], 1);
+        wait(NULL);
+    }
+}
 
 int open_file(char *argv, int i)
 {
@@ -100,18 +109,20 @@ int main(int argc, char **argv, char **env)
         {
             i = 3;
             fileout = open_file(argv[argc - 1], 0);
-            // heredoc();
+            heredoc(argv[2], argc);
         }
         else
         {
             i = 2;
             filein = open_file(argv[1], 2);
             fileout = open_file(argv[argc - 1], 1);
-            // dup2(filein, 0); //STDIN_FILENO
+            dup2(filein, 0); //STDIN_FILENO
         }
-        while (i <= argc - 2)
+        while (i < argc - 2) 
             process_new(argv[i++], env);
+        dup2(fileout, 1);
+        execute(argv[argc - 2], env);
     }
-    //error;
+    error();
     //return;
 }
