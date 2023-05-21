@@ -6,7 +6,7 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 18:53:21 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/05/16 21:03:27 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/05/21 18:21:30 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,12 @@ char *find_path(char *cmd, char **env)
     int     i;
 
     i = 0;
-    while (ft_strncmp(env[i], "PATH", 4) == 0)
+    while (env[i] != NULL)
+    {
+        if (ft_strncmp(env[i], "PATH", 4) == 0)
+            break ;
         i++;
+    }
     if (!env[i])
         return (NULL);
     paths = ft_split(env[i] + 5, ':');
@@ -44,16 +48,17 @@ char *find_path(char *cmd, char **env)
     {
         path_part = ft_strjoin(paths[i], "/");
         path = ft_strjoin(path_part, cmd);
-        free(path_part);
+        //free(path_part);
+
         if (access(path, F_OK) == 0)
             return (path);
-        free(path);
+        //free(path);
         i++;
     }
     i = -1;
     while (paths[++i])
         free(paths[i]);
-    free(paths);
+    //free(paths);
     return (NULL);
 }
 
@@ -66,6 +71,7 @@ void    execute(char *argv, char **env)
     cmd = ft_split(argv, ' ');
     if (slash_check(cmd[0]) == 0)
     {
+
         path = find_path(cmd[0], env);
         i = 0;
         if (!path)
@@ -76,6 +82,7 @@ void    execute(char *argv, char **env)
             error();
         }
     }
+
     if (execve(path, cmd, env) == -1)
         error();
 }

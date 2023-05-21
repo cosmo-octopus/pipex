@@ -6,7 +6,7 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 20:00:13 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/05/18 18:41:58 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/05/21 18:21:51 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,17 @@ void    process_new(char *argv, char **env)
     pid_t   id;
     int     fd[2];
 
+
     if (pipe(fd) == -1)
+    {
         error();
+    }
     id = fork();
     if (id == 0)
     {
+        dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
-        dup2(fd[1], 1);
+        close(fd[1]);
         execute(argv, env);
     }
     else
@@ -65,8 +69,8 @@ void    heredoc(char *delimiter, int argc)
     }
     else
     {
-        close(fd[1]);
-        dup2(fd[0], 1);
+        //close(fd[1]);
+        //dup2(fd[0], 1);
         wait(NULL);
     }
 }
@@ -116,11 +120,14 @@ int main(int argc, char **argv, char **env)
             i = 2;
             filein = open_file(argv[1], 2);
             fileout = open_file(argv[argc - 1], 1);
-            dup2(filein, 0); //STDIN_FILENO
+            dup2(filein, STDIN_FILENO); //STDIN_FILENO - 0
         }
-        while (i < argc - 2) 
+        while (i < argc - 2)
+        {
+            printf("%s\n", argv[i]);
             process_new(argv[i++], env);
-        dup2(fileout, 1);
+        }
+        dup2(fileout, STDOUT_FILENO);
         execute(argv[argc - 2], env);
     }
     error();
