@@ -6,7 +6,7 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 20:00:13 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/05/22 18:09:12 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/05/22 18:20:53 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void    process_new(char *argv, char **env)
 
 
     if (pipe(fd) == -1)
-        {printf ("a\n");error();}
+        error();
     id = fork();
     if (id == 0)
     {
@@ -50,7 +50,7 @@ void    heredoc(char *delimiter, int argc)
 
     argc = 1;
     if (pipe(fd) == -1)
-       {printf ("a\n");error();}
+       error();
     id = fork();
     if (id == 0)
     {
@@ -85,7 +85,7 @@ int open_file(char *argv, int i)
     else if (i == 2)
         file = open(argv, O_RDONLY, 0755);
     if (file == -1)
-        {printf ("a\n");error();}
+        error();
     return (file); 
 }
 
@@ -104,7 +104,7 @@ int main(int argc, char **argv, char **env)
     int i;
     int filein;
     int fileout;
-    
+
     if (argc >= 5)
     {
         if (ft_strncmp(argv[1], "here_doc", 8) == 0)
@@ -123,6 +123,7 @@ int main(int argc, char **argv, char **env)
         while (i < argc - 2)
             process_new(argv[i++], env);
         dup2(fileout, STDOUT_FILENO);
+        
         system("leaks pipex");
         execute(argv[argc - 2], env);
     }

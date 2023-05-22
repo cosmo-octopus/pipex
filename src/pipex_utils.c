@@ -6,7 +6,7 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 18:53:21 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/05/22 17:43:36 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/05/22 18:19:18 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ char *find_path(char *cmd, char **env)
     if (!env[i])
         return (NULL);
     paths = ft_split(env[i] + 5, ':');
-    dprintf (2, "cmd: %s\n", cmd);
     i = 0;
     while (paths[i])
     {
@@ -77,7 +76,6 @@ void    execute(char *argv, char **env)
             while (cmd[i])
                 free(cmd[i++]);
             free(cmd);
-            // {dprintf (2, "esftgyuoa\n");error();}
         }
     }
     execve(path, cmd, env);
