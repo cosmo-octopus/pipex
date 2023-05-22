@@ -6,7 +6,7 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 20:00:13 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/05/21 18:21:51 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/05/22 18:09:12 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,7 @@ void    process_new(char *argv, char **env)
 
 
     if (pipe(fd) == -1)
-    {
-        error();
-    }
+        {printf ("a\n");error();}
     id = fork();
     if (id == 0)
     {
@@ -52,7 +50,7 @@ void    heredoc(char *delimiter, int argc)
 
     argc = 1;
     if (pipe(fd) == -1)
-        error();
+       {printf ("a\n");error();}
     id = fork();
     if (id == 0)
     {
@@ -87,7 +85,7 @@ int open_file(char *argv, int i)
     else if (i == 2)
         file = open(argv, O_RDONLY, 0755);
     if (file == -1)
-        error();
+        {printf ("a\n");error();}
     return (file); 
 }
 
@@ -123,13 +121,11 @@ int main(int argc, char **argv, char **env)
             dup2(filein, STDIN_FILENO); //STDIN_FILENO - 0
         }
         while (i < argc - 2)
-        {
-            printf("%s\n", argv[i]);
             process_new(argv[i++], env);
-        }
         dup2(fileout, STDOUT_FILENO);
+        system("leaks pipex");
         execute(argv[argc - 2], env);
     }
-    error();
-    //return;
+    else
+       error();
 }

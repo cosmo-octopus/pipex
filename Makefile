@@ -7,7 +7,7 @@ OBJS			= $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 INCS			= -Iincludes
 CC				= cc 
 RM				= rm -rf
-CFLAGS			= -Wall -Wextra -Werror
+CFLAGS			= -Wall -Wextra -Werror #-fsanitize=address -g
 MK				= mkdir -p
 
 all:			$(OBJ_DIR) $(NAME)
@@ -30,5 +30,3 @@ fclean:			clean
 re:				fclean all
 
 .PHONY:			all clean fclean re bonus
-
-#-fsanitize=address -g
