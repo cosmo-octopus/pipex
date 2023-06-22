@@ -5,40 +5,24 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/05/10 20:00:13 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/05/22 18:20:53 by hbalasan         ###   ########.fr       */
+/*   Created: 2023/05/31 20:10:50 by hbalasan          #+#    #+#             */
+/*   Updated: 2023/06/22 20:03:32 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-void    error(void)
+void    close_and_free(int **pipes, int i)
 {
-    perror("Error");
-    exit(EXIT_FAILURE);
-}
+    int j;
 
-void    process_new(char *argv, char **env)
-{
-    pid_t   id;
-    int     fd[2];
-
-
-    if (pipe(fd) == -1)
-        error();
-    id = fork();
-    if (id == 0)
+    j = 0;
+    while (j < i)
     {
-        dup2(fd[1], STDOUT_FILENO);
-        close(fd[0]);
-        close(fd[1]);
-        execute(argv, env);
-    }
-    else
-    {
-        close(fd[1]);
-        dup2(fd[0], 0);
-        wait(NULL);
+        close(pipes[j][0]);
+        close(pipes[j][1]);
+        free(pipes[j]);
+        j++;
     }
 }
 
@@ -50,7 +34,7 @@ void    heredoc(char *delimiter, int argc)
 
     argc = 1;
     if (pipe(fd) == -1)
-       error();
+        error();
     id = fork();
     if (id == 0)
     {
@@ -67,8 +51,8 @@ void    heredoc(char *delimiter, int argc)
     }
     else
     {
-        //close(fd[1]);
-        //dup2(fd[0], 1);
+        close(fd[1]);
+        dup2(fd[0], STDOUT_FILENO); //STDOUT_FILENO - 1
         wait(NULL);
     }
 }
@@ -89,43 +73,111 @@ int open_file(char *argv, int i)
     return (file); 
 }
 
-/*
-./pipex infile cat ls outfile
-open()
-PATH=/...:/...:
-access( ---> check in PATH if no /
-execve
+void    process_new(int **pipes, char *argv, char **env, int i, int filein, int fileout, int argc) //FIX THISSSSSSSSSSS !! ! !!1!!!1
+{
+    pid_t   id;
+    // int     j;
 
-
-*/
+    // j = i - 2;
+    printf ("command num : %d, %s\n", i, argv);
+    id = fork();
+    if (id == -1)
+        error();
+    if (id == 0)
+    {
+        if (i == 2)
+        {
+            dup2(filein, STDIN_FILENO);
+            dup2(pipes[i - 2][1], STDOUT_FILENO);
+        }
+        else if (i == argc - 2)
+        {
+            dup2(pipes[i - 3][0], STDIN_FILENO);
+            dup2(fileout, STDOUT_FILENO);
+        }
+        else
+        {
+            dup2(pipes[i - 3][0], STDIN_FILENO);
+            dup2(pipes[i - 2][1], STDOUT_FILENO);
+        }
+        close(filein);
+        close(fileout);
+        int i = -1;
+        while (++i < argc - 4)
+        {
+            close(pipes[i][0]);
+            close(pipes[i][1]);
+            free(pipes[i]);
+        }
+        free(pipes);
+        execute(argv, env);
+    }
+}
 
 int main(int argc, char **argv, char **env)
 {
     int i;
     int filein;
     int fileout;
-
+    int **pipes;
+    
     if (argc >= 5)
     {
         if (ft_strncmp(argv[1], "here_doc", 8) == 0)
         {
-            i = 3;
+            i = 2;
             fileout = open_file(argv[argc - 1], 0);
             heredoc(argv[2], argc);
         }
         else
         {
-            i = 2;
+            pipes = (int **)malloc(sizeof(int *) * (argc - 4));
+            i = 0;
+            while (i < argc - 4)
+            {
+                pipes[i] = (int *)malloc(sizeof(int) * 2);
+                if (pipes[i])  
+                {
+                    if (pipe(pipes[i]) == -1) //fd[0] -> the read end, fd[1] -> write end;
+                    {
+                        free(pipes[i]);
+                        close_and_free(pipes, i);
+                        free(pipes);
+                        error();
+                    }
+                }
+                else if (!pipes[i] && i == 0)
+                    free(pipes);
+                else
+                {
+                    close_and_free(pipes, i);
+                    free(pipes);
+                    error();
+                }
+                i++;
+            }
+            i = 1;
             filein = open_file(argv[1], 2);
             fileout = open_file(argv[argc - 1], 1);
-            dup2(filein, STDIN_FILENO); //STDIN_FILENO - 0
+            // process_new(pipes, NULL, NULL, i, filein, argc);
+            // i++;
+            //........................
         }
-        while (i < argc - 2)
-            process_new(argv[i++], env);
-        dup2(fileout, STDOUT_FILENO);
         
-        system("leaks pipex");
-        execute(argv[argc - 2], env);
+        while (++i < argc - 1)
+        {
+            process_new(pipes, argv[i], env, i, filein, fileout, argc);
+        }
+        i = -1;
+        while (++i < argc - 4)
+        {
+            close(pipes[i][0]);
+            close(pipes[i][1]);
+            free(pipes[i]);
+        }
+        free(pipes);
+        while (wait(NULL) != -1)
+            ;
     }
     else
        error();

@@ -6,11 +6,17 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 18:53:21 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/05/22 18:19:18 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/06/21 21:07:44 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "../includes/pipex.h"
+
+void    error(void)
+{
+    perror("PIPEX Error");
+    exit(EXIT_FAILURE);
+}
 
 int slash_check(char *cmd)
 {
@@ -48,37 +54,32 @@ char *find_path(char *cmd, char **env)
     {
         path_part = ft_strjoin(paths[i], "/");
         path = ft_strjoin(path_part, cmd);
-        //free(path_part);
 
-        if (access(path, F_OK) == 0)
+        if (access(path, X_OK) == 0)
+        {
+            dprintf (2, "path path: %s\n", path);
+            free(cmd);
             return (path);
-        //free(path);
+        }
+        free(path);
         i++;
     }
+    
     free(paths);
-    return (NULL);
+    return (cmd);
 }
 
 void    execute(char *argv, char **env)
 {
     char    **cmd;
-    char    *path;
-    int     i;
 
     cmd = ft_split(argv, ' ');
     if (slash_check(cmd[0]) == 0)
     {
-
-        path = find_path(cmd[0], env);
-        i = 0;
-        if (!path)
-        {
-            while (cmd[i])
-                free(cmd[i++]);
-            free(cmd);
-        }
+       cmd[0] = find_path(cmd[0], env);
     }
-    execve(path, cmd, env);
+    // dprintf (2, "to exec: %s, %s\n", cmd[0], cmd[1]);
+    execve(cmd[0], cmd, env);
     write (2, "Error: Command not found\n", 25);
     exit (1);
     // if (execve(path, cmd, env) == -1)
