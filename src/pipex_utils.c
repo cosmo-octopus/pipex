@@ -6,7 +6,7 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/12 18:53:21 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/06/21 21:07:44 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/07/07 20:07:54 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ char *find_path(char *cmd, char **env)
 
         if (access(path, X_OK) == 0)
         {
-            dprintf (2, "path path: %s\n", path);
             free(cmd);
             return (path);
         }

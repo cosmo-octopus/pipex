@@ -6,7 +6,7 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/31 20:10:55 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/06/21 20:21:48 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/07/07 20:50:10 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,22 @@
 # include <sys/wait.h>
 # include "get_next_line.h"
 
+typedef struct s_pipex
+{
+    int     argc;
+    char    **argv;
+    char    **env;
+    int     **pipes;
+    int     filein;
+    int     fileout;
+} t_pipex;
+
 //____________________/ft_split.c/____________________//
 char	**ft_split(char const *s, char c);
 
 //_____________________/pipex.c/_____________________//
 int     open_file(char *argv, int i);
-void    heredoc(char *delimiter, int argc);
-// void    process_new(int **pipes, char *argv, char **env, int i, int file, int argc);
+// void    heredoc(t_pipex pipex, char *delimiter);
 void    close_and_free(int **pipes, int i);
 //____________________/pipex_utils___________________//
 void    error(void);
