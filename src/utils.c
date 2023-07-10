@@ -6,28 +6,28 @@
 /*   By: hbalasan <hbalasan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/15 19:04:21 by hbalasan          #+#    #+#             */
-/*   Updated: 2023/07/08 20:59:55 by hbalasan         ###   ########.fr       */
+/*   Updated: 2023/07/10 19:57:02 by hbalasan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 
-void    close_the_pipes(t_pipex pipex, int i)
+void	close_the_pipes(t_pipex pipex, int i)
 {
-    int j;
+	int	j;
 
-    j = -1;
-    while (++j < i)
-    {
-        close(pipex.pipes[j][0]);
-        close(pipex.pipes[j][1]);
-    }
+	j = -1;
+	while (++j < i)
+	{
+		close(pipex.pipes[j][0]);
+		close(pipex.pipes[j][1]);
+	}
 }
 
 void	to_free(int **arr, int j)
 {
 	int	i;
-	
+
 	i = -1;
 	while (++i < j)
 		free(arr[i]);
@@ -43,6 +43,18 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	i = 0;
 	while (*(s1 + i) && *(s2 + i) && *(s1 + i) == *(s2 + i) && i < n - 1)
 		i++;
+	return (*(unsigned char *)(s1 + i) - *(unsigned char *)(s2 + i));
+}
+
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	size_t	i;
+
+	i = 0;
+	while (*(s1 + i) && *(s2 + i) && *(s1 + i) == *(s2 + i))
+		i++;
+	if (*(s1 + i) == '\n' && *(s2 + i) == 0)
+		return (0);
 	return (*(unsigned char *)(s1 + i) - *(unsigned char *)(s2 + i));
 }
 
