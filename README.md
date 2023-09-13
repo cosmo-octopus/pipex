@@ -2,8 +2,6 @@
 
 This project involves a detailed exploration and programming implementation of a well-known UNIX mechanism. The goal of the **Pipex** project is to create our own version of the pipe functionality commonly used in shells (`|`). This will involve utilizing a new set of functions that introduce concepts such as working with multiple processes, pipes, forks, and duplicating file descriptors.
 
-> :warning: **Note:** It's strongly advised not to blindly copy and paste code without understanding it, both for your own learning and for the integrity of the educational process.
-
 ## About the Project
 
 In this project, the objective is to develop a program that mimics the behavior of the following shell command:
